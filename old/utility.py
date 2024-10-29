@@ -5,7 +5,7 @@ import psutil
 import os
 import sys
 
-
+# TODO 优化这坨狗屎
 def is_admin():
     try:
         return ctypes.windll.shell32.IsUserAnAdmin()

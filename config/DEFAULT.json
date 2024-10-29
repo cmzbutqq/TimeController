@@ -1,0 +1,42 @@
+{
+  "name": "DEFAULT",
+  "lock_rules": [
+    {
+      "name": "休息日",
+      "valid": "false",
+
+      "starttime": "23:50:00",
+      "endtime": "04:00:00",
+      "days": ["6-7"],
+
+      "type": "BLACKLIST",
+      "list": []
+    },
+    {
+      "name": "工作日",
+      "valid": "false",
+
+      "starttime": "23:40:00",
+      "endtime": "04:00:00",
+      "days": ["1-2", 3, 4, 5],
+      "type": "BLACKLIST",
+      "list": []
+    }
+  ],
+  "tasks": [
+    {
+      "name": "运动",
+      "counters": ["DEFAULT"],
+      "type": "COUNT",
+      "target": [
+        {
+          "type": "WEEKLY",
+          "target": 4
+        },
+        {
+          "type": "MONTHLY"
+        }
+      ]
+    }
+  ]
+}

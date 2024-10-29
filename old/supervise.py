@@ -1,7 +1,7 @@
 from utility import *
 run_as_admin()
 wait_until_unlock(60)
-
+# TODO 优化这坨狗屎
 preTm = int('220000')
 begTm = int('233000')
 endTm = int('060000')
