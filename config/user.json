@@ -1,0 +1,88 @@
+{
+  "locks": [
+    {
+      "name": "控制",
+      "activate": false,
+      "punish": "MINIMIZE",
+      "list_type": "WHITELIST",
+      "list": ["WHITE"],
+      "time_rules": [
+        {
+          "start_time": "23:50",
+          "end_time": "23:51",
+          "days": ["1-5"]
+        },
+        {
+          "start_time": "00:00",
+          "end_time": "00:01",
+          "days": ["6-7"]
+        }
+      ]
+    },
+    {
+      "name": "守护进程",
+      "activate": false,
+      "punish": "KILL",
+      "list_type": "BLACKLIST",
+      "list": ["BLACK"],
+      "time_rules": [
+        {
+          "start_time": "23:50",
+          "end_time": "23:51",
+          "days": ["1-5"]
+        },
+        {
+          "start_time": "00:00",
+          "end_time": "00:01",
+          "days": ["6-7"]
+        }
+      ]
+    }
+  ],
+
+  "counters": [
+    {
+      "id":0,
+      "name": "运动",
+      "note": "这是计数器的备注",
+      "activate":true,
+      "daily_aim": null,
+      "weekly_aim": 4,
+      "monthly_aim": 15,
+      "deadline_aim": { "date": "2023-12-31", "aim": 100 }
+    }
+  ],
+
+  "timers": [
+    {
+      "id":0,
+      "name": "学习",
+      "note": "这是计时器的备注",
+      "activate":true,
+      "counters": ["TIMERS", 80],
+      "daily_aim": null,
+      "weekly_aim": 300,
+      "monthly_aim": 1500,
+      "deadline_aim": null
+    }
+  ],
+
+  "presets": {
+    "BLACK": ["Taskmgr.exe", "mmc.exe"],
+    "WHITE": [
+      "LockApp.exe",
+      "System Idle Process",
+      "EXCEPTION",
+      "StartMenuExperienceHost.exe",
+      "SearchHost.exe",
+      "coodesker-x64.exe",
+      "explorer.exe",
+      "QQ.exe",
+      "WeChat.exe",
+      "cloudmusic.exe"
+    ],
+    "TIMERS": [0, 5, 10, 20, 30, 45, 60],
+    "1-5": [1, 2, 3, 4, 5],
+    "6-7": [6, 7]
+  }
+}
