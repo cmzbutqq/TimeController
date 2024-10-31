@@ -40,7 +40,7 @@
     }
   ],
 
-  "tallies": [
+  "count_tasks": [
     {
       "id":0,
       "name": "运动",
@@ -53,7 +53,7 @@
     }
   ],
 
-  "chronos": [
+  "timer_tasks": [
     {
       "id":0,
       "name": "学习",
