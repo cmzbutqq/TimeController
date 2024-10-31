@@ -1,5 +1,5 @@
 {
-  "locks": [
+  "lockers": [
     {
       "name": "控制",
       "activate": false,
@@ -40,7 +40,7 @@
     }
   ],
 
-  "counters": [
+  "tallies": [
     {
       "id":0,
       "name": "运动",
@@ -53,7 +53,7 @@
     }
   ],
 
-  "timers": [
+  "chronos": [
     {
       "id":0,
       "name": "学习",

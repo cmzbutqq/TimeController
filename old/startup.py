@@ -2,7 +2,6 @@ from utility import *
 import pyautogui
 run_as_admin()
 wait_until_unlock(5)
-# TODO 优化这坨狗屎
 def loc(pth):
     try:
         return pyautogui.locateCenterOnScreen(pth, confidence=0.95)
