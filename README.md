@@ -8,7 +8,7 @@ MyClass
 CONST_VAR  
 my_var  
 my_function  
-my_method
+my_method  
 _ # placeholder  
 _private_things
 
