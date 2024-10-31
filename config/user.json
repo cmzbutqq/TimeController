@@ -55,7 +55,7 @@
 
   "timer_tasks": [
     {
-      "id":0,
+      "id":1,
       "name": "学习",
       "note": "这是计时器的备注",
       "activate":true,
