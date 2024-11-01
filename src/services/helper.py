@@ -20,7 +20,7 @@ def dataclass(cls): # 类装饰器，给类加上__repr__,__str__,__eq__,__hash_
                 ret += f"\t{k} : "+ shorten(f"{v}",50)
         return ret
     cls.__str__ = __str__
-    def __repr__(self)->str:
+    def __repr__(self)->str: 
         ret:str = f"class:{self.__class__.__name__}\t"
         if hasattr(self,"__slots__"):
             for attr in self.__slots__:
