@@ -1,4 +1,6 @@
 from typing import Any, Optional, Callable, Union
+from textwrap import shorten
+import time
 
 def singleton(cls): # 类装饰器，给类加上单例模式    ！！必须放在其他类装饰器之上（之外） 因为他会把类退化成函数
     instances = {}
@@ -8,7 +10,7 @@ def singleton(cls): # 类装饰器，给类加上单例模式    ！！必须放
         return instances[cls]
     return get_instance
 
-from textwrap import shorten
+
 def dataclass(cls): # 类装饰器，给类加上__repr__,__str__,__eq__,__hash__方法
     def __str__(self)->str:
         ret:str = f"class:{self.__class__.__name__}\t"
@@ -53,7 +55,7 @@ def noexception(func): # 装饰器，给函数加上try-except
     return wrapper
 
 
-import time
+
 class timeit: # 计时器 计算with timeit():后面的代码块运行时间
     def __enter__(self):
         self.start = time.time()
