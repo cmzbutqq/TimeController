@@ -64,9 +64,9 @@ class timeit: # 计时器 计算with timeit():后面的代码块运行时间
             print(f"ERROR:{exc_type}\t{exc_val}\t{exc_tb}")
         print(f"time cost:{time.time()-self.start}")
         
-def timeme(func:Callable)->Callable: # 装饰器，给函数加上计时器
+def timeme(func:Callable)->Callable: # 函数装饰器，给函数加上计时器
     def wrapper(*args,**kwargs):
-        start=time.time()
+        start=time.time()   
         ret = func(*args,**kwargs)
         print(f"{func.__name__}\tcost time:{time.time()-start}")
         return ret
