@@ -14,7 +14,7 @@ def singleton(cls): # 类装饰器，给类加上单例模式    ！！必须放
 def dataclass(cls): # 类装饰器，给类加上__repr__,__str__,__eq__,__hash__方法
     def __str__(self)->str:
         ret:str = f"class:{self.__class__.__name__}\t"
-        if hasattr(self,"__slots__"):
+        if hasattr(self,"__slots__"): # 这个if statement 不能提出来，因为cls可能在采用slots和采用dict间反复横跳
             for attr in self.__slots__:
                 ret += f"\t{attr} = "+ shorten(f"{getattr(self,attr)}",50)
         elif hasattr(self,"__dict__"):
@@ -32,15 +32,15 @@ def dataclass(cls): # 类装饰器，给类加上__repr__,__str__,__eq__,__hash_
                 ret += f"\t{k} : "+ shorten(f"{v}",200)
         return ret
     cls.__repr__ = __repr__
-    def __eq__(self,other)->bool:
+    def __eq__(self,other)->bool: # TODO 会不会Raise Exception?
         if hasattr(self,"__slots__"):
-            return all(getattr(self,attr)==getattr(other,attr) for attr in self.__slots__)
+            return all(getattr(self,attr)==getattr(other,attr) for attr in self.__slots__) 
         elif hasattr(self,"__dict__"):
             return self.__dict__ == other.__dict__
     cls.__eq__ = __eq__
-    def __hash__(self)->int:
+    def __hash__(self)->int: # TODO 相等但不相同时hash值似乎不一样
         if hasattr(self,"__slots__"):
-            return hash([(attr,getattr(self,attr)) for attr in self.__slots__])
+            return hash([(attr,getattr(self,attr)) for attr in self.__slots__]) 
         elif hasattr(self,"__dict__"):
             return hash(self.__dict__)
     __hash__ = __hash__
