@@ -10,7 +10,6 @@ def singleton(cls): # 类装饰器，给类加上单例模式    ！！必须放
         return instances[cls]
     return get_instance
 
-
 def dataclass(cls): # 类装饰器，给类加上__repr__,__str__,__eq__,__hash__方法
     def __str__(self)->str:
         ret:str = f"class:{self.__class__.__name__}\t"
@@ -53,8 +52,6 @@ def noexception(func): # 装饰器，给函数加上try-except
         except Exception as e:
             print(f"ERROR:{e}")
     return wrapper
-
-
 
 class timeit: # 计时器 计算with timeit():后面的代码块运行时间
     def __enter__(self):

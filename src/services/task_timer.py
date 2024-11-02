@@ -1,12 +1,12 @@
 """_summary_
     TODO 任务计时器
 """
-from config import *
 import datetime as tm
+from config import *
 
-presets:Callable=config.get('presets')
 
 
+@singleton
 class TaskTimer:
     __slot__ = ('task_id','countdown_time','start_time','valid_time')
     def __init__(self, task_id:int, countdown_time:Optional[int]):

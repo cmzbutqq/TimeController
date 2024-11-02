@@ -4,7 +4,7 @@
 import json
 from helper import *
 
-def cfg_path(name="user"):
+def cfg_path(name:str = "user"):
     return f"config/{name}.json"
 
 
@@ -66,6 +66,7 @@ class Config:
         return fcfg == self.cfg
 
 config=Config(cfg_path())
+
 
 if __name__ == "__main__":
     # 单例检查
