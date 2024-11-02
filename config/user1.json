@@ -1,35 +1,4 @@
 {
-  "lockers": [],
+  "lockers": []
 
-  "count_tasks": [
-    {
-      "id": 0,
-      "deadline_aim": { "date": "2023-12-31", "aim": 100 }
-    }
-  ],
-
-  "timer_tasks": [
-    {
-      "id": 1
-    }
-  ],
-
-  "presets": {
-    "BLACK": ["Taskmgr.exe", "mmc.exe"],
-    "WHITE": ["LockApp.exe", "System Idle Process", "cloudmusic.exe"],
-    "TIMERS": [0, 5, 10, 20, 30, 45, 60],
-    "1-5": [1, 2, 3, 4, 5],
-    "6-7": [6, 7]
-  },
-  "settings": {
-    "style": {},
-    "preferences": {
-      "run_as_admin": false,
-      "auto_start": false
-    },
-    "debug": true,
-    "advanced": {
-      "lock_active_interval_sec": 1
-    }
-  }
 }

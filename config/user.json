@@ -1,101 +1,125 @@
 {
-  "lockers": [
-    {
-      "name": "控制",
-      "activate": false,
-      "punish": "MINIMIZE",
-      "list_type": "WHITELIST",
-      "list": ["WHITE"],
-      "time_rules": [
+    "lockers": [
         {
-          "start_time": "23:50",
-          "end_time": "23:51",
-          "days": ["1-5"]
+            "name": "控制",
+            "activate": false,
+            "punish": "MINIMIZE",
+            "list_type": "WHITELIST",
+            "list": [
+                "WHITE"
+            ],
+            "time_rules": [
+                {
+                    "start_time": "23:50",
+                    "end_time": "23:51",
+                    "days": [
+                        "1-5"
+                    ]
+                },
+                {
+                    "start_time": "00:00",
+                    "end_time": "00:01",
+                    "days": [
+                        "6-7"
+                    ]
+                }
+            ]
         },
         {
-          "start_time": "00:00",
-          "end_time": "00:01",
-          "days": ["6-7"]
+            "name": "守护进程",
+            "activate": false,
+            "punish": "KILL",
+            "list_type": "BLACKLIST",
+            "list": [
+                "BLACK"
+            ],
+            "time_rules": [
+                {
+                    "start_time": "23:50",
+                    "end_time": "23:51",
+                    "days": [
+                        "1-5"
+                    ]
+                },
+                {
+                    "start_time": "00:00",
+                    "end_time": "00:01",
+                    "days": [
+                        "6-7"
+                    ]
+                }
+            ]
         }
-      ]
-    },
-    {
-      "name": "守护进程",
-      "activate": false,
-      "punish": "KILL",
-      "list_type": "BLACKLIST",
-      "list": ["BLACK"],
-      "time_rules": [
-        {
-          "start_time": "23:50",
-          "end_time": "23:51",
-          "days": ["1-5"]
-        },
-        {
-          "start_time": "00:00",
-          "end_time": "00:01",
-          "days": ["6-7"]
-        }
-      ]
-    }
-  ],
-
-  "count_tasks": [
-    {
-      "id":0,
-      "name": "运动",
-      "note": "这是计数器的备注",
-      "activate":true,
-      "daily_aim": null,
-      "weekly_aim": 4,
-      "monthly_aim": 15,
-      "deadline_aim": { "date": "2023-12-31", "aim": 100 }
-    }
-  ],
-
-  "timer_tasks": [
-    {
-      "id":1,
-      "name": "学习",
-      "note": "这是计时器的备注",
-      "activate":true,
-      "counters": ["TIMERS", 80],
-      "daily_aim": null,
-      "weekly_aim": 300,
-      "monthly_aim": 1500,
-      "deadline_aim": null
-    }
-  ],
-
-  "presets": {
-    "BLACK": ["Taskmgr.exe", "mmc.exe"],
-    "WHITE": [
-      "LockApp.exe",
-      "System Idle Process",
-      "EXCEPTION",
-      "StartMenuExperienceHost.exe",
-      "SearchHost.exe",
-      "coodesker-x64.exe",
-      "explorer.exe",
-      "QQ.exe",
-      "WeChat.exe",
-      "cloudmusic.exe"
     ],
-    "TIMERS": [0, 5, 10, 20, 30, 45, 60],
-    "1-5": [1, 2, 3, 4, 5],
-    "6-7": [6, 7]
-  },
-  "settings":{
-    "style": {},
-    "preferences": {
-      "run_as_admin": false,
-      "auto_start": false
+    "count_tasks": [
+        {
+            "id": 0,
+            "name": "运动",
+            "note": "这是计数器的备注",
+            "activate": true,
+            "daily_aim": null,
+            "weekly_aim": 4,
+            "monthly_aim": 15,
+            "deadline_aim": {
+                "date": "2023-12-31",
+                "aim": 100
+            }
+        }
+    ],
+    "timer_tasks": [
+        {
+            "id": 1,
+            "name": "学习",
+            "note": "这是计时器的备注",
+            "activate": true,
+            "counters": [
+                "TIMERS",
+                80
+            ],
+            "daily_aim": null,
+            "weekly_aim": 300,
+            "monthly_aim": 1500,
+            "deadline_aim": null
+        }
+    ],
+    "presets": {
+        "BLACK": [
+            "Taskmgr.exe",
+            "mmc.exe"
+        ],
+        "WHITE": [],
+        "TIMERS": [
+            0,
+            5,
+            10,
+            20,
+            30,
+            45,
+            60
+        ],
+        "1-5": [
+            1,
+            2,
+            3,
+            4,
+            5
+        ],
+        "6-7": [
+            6,
+            7
+        ]
     },
-    "debug": true,
-    "advanced": {
-      "lock_active_interval_sec": 1,
-      "lock_idle_interval_sec": 2,
-      "timer_interval_sec": 0.5
+    "settings": {
+        "style": {},
+        "preferences": {
+            "run_as_admin": false,
+            "auto_start": false
+        },
+        "debug": true,
+        "advanced": {
+            "lock_active_interval_sec": 1,
+            "lock_idle_interval_sec": 2,
+            "timer_interval_sec": 0.5
+        }
     }
-  }
 }

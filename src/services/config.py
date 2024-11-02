@@ -4,7 +4,7 @@
 import json
 from helper import *
 
-def file_path(name="user"):
+def cfg_path(name="user"):
     return f"config/{name}.json"
 
 
@@ -20,12 +20,16 @@ class Config:
         self.pth:str    = ""
         self.load(path)
     
-    def load(self,path:str)->None: # cfg:dict <- json 将文件中的内容加载到实例中
+    def load(self,path=None)->None: # cfg:dict <- json 将文件中的内容加载到实例中
+        if path is None:
+            path=self.pth
         with open(path, "r", encoding="utf-8") as f:
             self.cfg = json.load(f) # 注意：cfg的id变了
             self.pth = path # 注意：会更新pth路径
     
-    def save(self,path:str)->None: # json <- cfg:dict 将实例中的更改保存到文件中
+    def save(self,path=None)->None: # json <- cfg:dict 将实例中的更改保存到文件中
+        if path is None:
+            path=self.pth
         with open(path, "w", encoding="utf-8") as f:
             json.dump(self.cfg, f, indent=4, ensure_ascii=False)
             self.pth = path # 注意：会更新pth路径
@@ -61,7 +65,7 @@ class Config:
             fcfg = json.load(f)
         return fcfg == self.cfg
 
-config=Config(file_path())
+config=Config(cfg_path())
 
 if __name__ == "__main__":
     # 单例检查
