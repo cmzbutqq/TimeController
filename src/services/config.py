@@ -5,8 +5,7 @@ import json
 from helper import *
 
 def cfg_path(name:str = "user"):
-    return f"config/{name}.json"
-
+    return f"configs/{name}.json"
 
 jval_t = Union[dict,list,str,int,float,bool,None]
 jkey_t = Union[str,int]
@@ -66,7 +65,6 @@ class Config:
         return fcfg == self.cfg
 
 config=Config(cfg_path())
-
 
 if __name__ == "__main__":
     # 单例检查
