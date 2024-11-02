@@ -1,9 +1,9 @@
-from typing import Any, Optional, Callable, Union
+from typing import Any, Optional, Callable, Union ,Sequence
 from textwrap import shorten
 import time
 
 def singleton(cls): # 类装饰器，给类加上单例模式    ！！必须放在其他类装饰器之上（之外） 因为他会把类退化成函数
-    instances = {}
+    instances = {}  # TODO instances 的生命周期是不是全局的？
     def get_instance(*args, **kwargs):
         if cls not in instances:
             instances[cls] = cls(*args, **kwargs)
@@ -91,3 +91,5 @@ if __name__ == "__main__":
     a = A(1,2)
     b = A(1,2)
     dprint(a , b)
+    
+    breakpoint()

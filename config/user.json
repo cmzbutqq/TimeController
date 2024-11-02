@@ -42,10 +42,10 @@
 
   "count_tasks": [
     {
-      "id": 0,
+      "id":0,
       "name": "运动",
       "note": "这是计数器的备注",
-      "activate": true,
+      "activate":true,
       "daily_aim": null,
       "weekly_aim": 4,
       "monthly_aim": 15,
@@ -55,10 +55,10 @@
 
   "timer_tasks": [
     {
-      "id": 1,
+      "id":1,
       "name": "学习",
       "note": "这是计时器的备注",
-      "activate": true,
+      "activate":true,
       "counters": ["TIMERS", 80],
       "daily_aim": null,
       "weekly_aim": 300,
@@ -85,7 +85,7 @@
     "1-5": [1, 2, 3, 4, 5],
     "6-7": [6, 7]
   },
-  "settings": {
+  "settings":{
     "style": {},
     "preferences": {
       "run_as_admin": false,
