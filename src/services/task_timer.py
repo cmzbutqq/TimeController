@@ -55,9 +55,5 @@ class TaskTimer:
 
 if __name__ == '__main__':
     t=TaskTimer(1)
-    cdt=TaskTimer(2,countdown_time=timedelta(seconds=2))
-    while(cdt.end is None):
-        tm.sleep(config.get('settings',"advanced","timer_interval_sec")())
-        print(t)
-        print(cdt)
+    cdt=TaskTimer(2,countdown_time=timedelta(seconds=5))
     breakpoint()
