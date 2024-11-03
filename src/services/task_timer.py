@@ -38,15 +38,19 @@ class TaskTimer:
             return
         self.pause()
         self.end = datetime.now()
+        
+    @property
+    def _used(self)->timedelta: # 理论已用时间，不会改变计时器状态
+        return self._last[1] + datetime.now() - self._last[0] if self.run else self._last[1]
     
-    def update(self)->TimerStatus:
-        used_time = self._last[1] + datetime.now() - self._last[0] if self.run else self._last[1]
-        if (self.end is None) and (self.countdown is not None) and (used_time > self.countdown): # 未结束+倒计时+超时
+    @property
+    def status(self)->TimerStatus: # 更新并获取状态
+        if (self.end is None) and (self.countdown is not None) and (self._used > self.countdown): # 未结束+倒计时+超时
             self.stop() # 自动结束
-        return TimerStatus(self.task_id,self.countdown,self.start,self.end,self.run,used_time)
+        return TimerStatus(self.task_id,self.countdown,self.start,self.end,self.run,self._used)
     
     def __repr__(self)->str:
-        status=self.update() # 注意这里会update
+        status=self.status # 注意这里会update
         return f'任务id:{status.task_id} 倒计时:{status.countdown}\n开始时间:{status.start} 结束时间:{status.end}\n是否运行:{status.running} 已用时间:{status.used_time}'
 
 
