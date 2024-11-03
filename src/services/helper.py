@@ -1,6 +1,6 @@
 from typing import Any, Optional, Callable, Union ,Sequence
 from textwrap import shorten
-import time
+import time as tm
 
 def singleton(cls): # 类装饰器，给类加上单例模式    ！！必须放在其他类装饰器之上（之外） 因为他会把类退化成函数
     instances = {}  # TODO instances 的生命周期是不是全局的？
@@ -55,19 +55,19 @@ def noexception(func): # 装饰器，给函数加上try-except
 
 class timeit: # 计时器 计算with timeit():后面的代码块运行时间
     def __enter__(self):
-        self.start = time.time()
+        self.start = tm.time()
         print(f"time start:{self.start}")
         return self
     def __exit__(self, exc_type, exc_val, exc_tb):
         if exc_tb is not None:
             print(f"ERROR:{exc_type}\t{exc_val}\t{exc_tb}")
-        print(f"time cost:{time.time()-self.start}")
+        print(f"time cost:{tm.time()-self.start}")
         
 def timeme(func:Callable)->Callable: # 函数装饰器，给函数加上计时器
     def wrapper(*args,**kwargs):
-        start=time.time()   
+        start=tm.time()   
         ret = func(*args,**kwargs)
-        print(f"{func.__name__}\tcost time:{time.time()-start}")
+        print(f"{func.__name__}\tcost time:{tm.time()-start}")
         return ret
     return wrapper
 
