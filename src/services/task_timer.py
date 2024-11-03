@@ -53,9 +53,6 @@ class TaskTimer:
         status=self.status # 注意这里会update
         return f'任务id:{status.task_id} 倒计时:{status.countdown}\n开始时间:{status.start} 结束时间:{status.end}\n是否运行:{status.running} 已用时间:{status.used_time}'
 
-
-
-
 if __name__ == '__main__':
     t=TaskTimer(1)
     cdt=TaskTimer(2,countdown_time=timedelta(seconds=2))
