@@ -1,3 +1,6 @@
-"""_summary_
-    TODO 特定时间段使用限制
-"""
+from config import *
+from utils.sysutils import *
+
+run_as_admin()
+wait_until_unlock(60)
+

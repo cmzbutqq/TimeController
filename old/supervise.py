@@ -1,25 +1,8 @@
-from utility import *
-run_as_admin()
-wait_until_unlock(60)
-preTm = int("220000")
-begTm = int("233000")
-endTm = int("060000")
+
 INTERVAL = 0.1
-BLACK_LIST = (  # preTm ~ begTm 间不允许前台的进程
-    "Taskmgr.exe",
-    "mmc.exe"
+BLACK_LIST = ( 
 )
-WHITE_LIST = (  # begTm ~ endTm 间允许前台的进程
-    "LockApp.exe",
-    "System Idle Process",
-    "EXCEPTION",
-    "StartMenuExperienceHost.exe",
-    "SearchHost.exe",
-    "coodesker-x64.exe",
-    "explorer.exe",
-    "QQ.exe",
-    "WeChat.exe",
-    "cloudmusic.exe",
+WHITE_LIST = ( 
 )
 
 SW_MINIMIZE = 6

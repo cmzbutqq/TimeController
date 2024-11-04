@@ -1,10 +1,8 @@
 import time as tm
-import ctypes
+import ctypes,psutil,os,sys
 from ctypes import wintypes
-import psutil
-import os
-import sys
 
+__all__ = ('is_admin','run_as_admin','fore_window_info','start','is_locked','wait_until_unlock')
 
 def is_admin():
     try:
@@ -19,28 +17,11 @@ def run_as_admin():
         # 重新运行脚本作为管理员
         ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, " ".join(sys.argv), None, 1)
         sys.exit()
-
-
-def dprint(var):  # 同时打印变量及其类型
-    print(f'{var}\t{type(var)}')
-
-
-def now_int():  # 当前时间转字符串再转整数
-    return int(tm.strftime('%H%M%S',))
-
-
-def now_between(beg_tm, end_tm):
-    now_tm = now_int()
-    if beg_tm >= end_tm:
-        result = now_tm <= end_tm or now_tm >= beg_tm
-    else:
-        result = now_tm <= end_tm and now_tm >= beg_tm
-    return result
-
-
+        
+        
+        
 # 定义需要的 Windows API 函数和常量
 user32 = ctypes.WinDLL('user32', use_last_error=True)
-psapi = ctypes.WinDLL('psapi', use_last_error=True)
 
 
 def fore_window_info():  # 获取前台进程信息（睡眠、锁屏时 Process Name: System Idle Process      LockApp.exe）
@@ -67,27 +48,24 @@ def start(pth):  # 依据路径启动或打开 并返回是否成功
         return True
     except FileNotFoundError:
         return False
+    
 
 def is_locked():
     _, _, _, nm = fore_window_info()
-    WHITE_LIST = (
+    SLEEP_LIST = (
         'LockApp.exe',
         'System Idle Process',
         'EXCEPTION'
     )
-    for name in WHITE_LIST:
-        if name == nm:
-            return True
-    return False
+    return nm in SLEEP_LIST
 
-def wait_until_unlock(post_delay,detect_delay=1):
+def wait_until_unlock(delay,interval=1):
     while is_locked():
-        tm.sleep(detect_delay)
-    tm.sleep(post_delay)
-
-
+        tm.sleep(interval)
+    tm.sleep(delay)
+    
 if __name__ == '__main__':
     while True:
         tm.sleep(0.5)
-        hwnd, _, _, nm = fore_window_info()
-        print(nm)
+        s = (fore_window_info())
+        print(s[3])

@@ -2,7 +2,7 @@
     配置文件交互
 """
 import json
-from helper import *
+from utils.helper import *
 
 def cfg_path(name:str = "user"):
     return f"configs/{name}.json"
