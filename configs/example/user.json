@@ -2,8 +2,8 @@
   "lockers": [
     {
       "name": "控制",
-      "activate": false,
-      "punish": "MINIMIZE",
+      "on": false,
+      "punish": "DEBUG",
       "list_type": "WHITELIST",
       "list": ["WHITE"],
       "time_rules": [
@@ -21,8 +21,8 @@
     },
     {
       "name": "守护进程",
-      "activate": false,
-      "punish": "KILL",
+      "on": false,
+      "punish": "DEBUG",
       "list_type": "BLACKLIST",
       "list": ["BLACK"],
       "time_rules": [
@@ -95,6 +95,7 @@
     "advanced": {
       "lock_active_interval_sec": 1,
       "lock_idle_interval_sec": 2,
+      "lock_off_interval_sec": 5,
       "timer_interval_sec": 0.5
     }
   }

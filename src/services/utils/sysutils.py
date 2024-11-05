@@ -1,8 +1,8 @@
-import time as tm
+from time import sleep
 import ctypes,psutil,os,sys
 from ctypes import wintypes
 
-__all__ = ('is_admin','run_as_admin','fore_window_info','start','is_locked','wait_until_unlock')
+__all__ = ('is_admin','run_as_admin','fore_window_info','start','is_locked','wait_until_unlock','os','user32','sleep')
 
 def is_admin():
     try:
@@ -39,7 +39,7 @@ def fore_window_info():  # 获取前台进程信息（睡眠、锁屏时 Process
         process_name = process.name()
     except (psutil.NoSuchProcess, psutil.AccessDenied):
         process_name = "EXCEPTION"
-    return hwnd, pid.value, window_name, process_name
+    return (hwnd, pid.value, window_name, process_name)
 
 
 def start(pth):  # 依据路径启动或打开 并返回是否成功
@@ -61,11 +61,11 @@ def is_locked():
 
 def wait_until_unlock(delay,interval=1):
     while is_locked():
-        tm.sleep(interval)
-    tm.sleep(delay)
+        sleep(interval)
+    sleep(delay)
     
 if __name__ == '__main__':
     while True:
-        tm.sleep(0.5)
+        sleep(0.5)
         s = (fore_window_info())
         print(s[3])
