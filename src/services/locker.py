@@ -4,14 +4,14 @@
 from config import *
 from utils.sysutils import *
 from datetime import datetime, timedelta, time
-from threading import Thread # 每个Locker一个线程 这个py文件相对主文件可以新开一个进程
+from threading import Thread,Event # 每个Locker一个线程 这个py文件相对主文件可以新开一个进程
 
-__all__ = ("LockThread","peroid","Thread")
+__all__ = ("Locker","peroid","Thread","Event")
 
 peroid=tuple[time,time]
 SW_MINIMIZE = 6
 WM_CLOSE = 16
-class LockThread():
+class Locker():
     _presets:Callable = config.get("presets")
     _active_int:Callable = config.get("settings","advanced","lock_active_interval_sec")
     _idle_int:Callable = config.get("settings","advanced","lock_idle_interval_sec")
@@ -45,7 +45,7 @@ class LockThread():
         rules=self.lock["time_rules"]
         ret=([],[],[],[],[],[],[])
         for rule in rules:
-            days=LockThread.presets_decode(rule["days"]) # generator
+            days=Locker.presets_decode(rule["days"]) # generator
             start ,end = str2tm(rule["start_time"]),str2tm(rule["end_time"])
             overnight = start > end
             for day in days: # day: 周一1周日7
@@ -59,7 +59,7 @@ class LockThread():
     @property
     def proc_list(self)->list:
         plist:list = self.lock["list"]
-        return list(LockThread.presets_decode(plist))
+        return list(Locker.presets_decode(plist))
     
     @property
     def on(self)->bool:
@@ -107,23 +107,33 @@ class LockThread():
                 return True
         return False
         
-    def run(self)->None:
+    def run(self,exit_event:Event)->None:
         while True:
+            if exit_event.is_set():
+                print(f"locker {self.lock['name']}: EXIT")
+                return
             if self.on is False:
-                sleep(LockThread._off_int())
+                sleep(Locker._off_int())
                 print(f"locker {self.lock['name']}: off")
                 continue
             if self.active is False:
-                sleep(LockThread._idle_int())
+                sleep(Locker._idle_int())
                 print(f"locker {self.lock['name']}: idle")
                 continue
             if self.violate is None:
-                sleep(LockThread._active_int())
+                sleep(Locker._active_int())
                 print(f"locker {self.lock['name']}: active")
                 continue
             self.punish(self.violate) # 这里再传一次violate是因为别的Lockers可能已经punish了，为了避免竞争
-            sleep(LockThread._active_int())
+            sleep(Locker._active_int())
             print(f"locker {self.lock['name']}: violate")
 
 if __name__ == "__main__":
-    breakpoint()
+    locks:list[Locker]=[Locker(idx) for idx in config.keys("lockers")]
+    exit=Event()
+    threads=[Thread(target=lock.run,args=(exit,)) for lock in locks]
+    [thread.start() for thread in threads]
+    sleep(10)
+    exit.set()
+    [thread.join() for thread in threads]
+        
