@@ -63,7 +63,6 @@ class TaskTimer:
     TODO 重写任务记录表交互
 """
 import csv
-from task_timer import *
 
 def dur_reg(duration:timedelta)->timedelta: # 去除天数和微秒数
     return timedelta(seconds=duration.seconds)
