@@ -5,6 +5,7 @@ from config import *
 from utils.helper import *
 from utils.sysutils import *
 from threading import Thread,Event # 每个Locker一个线程 这个py文件相对主文件可以新开一个进程
+from rich import print
 
 __all__ = ("Locker","peroid","Thread","Event")
 
@@ -79,7 +80,7 @@ class Locker():
             case "CLOSE":
                 user32.PostMessageW(hwnd, WM_CLOSE, 0, 0)
             case "DEBUG":
-                print(fore_window_info())
+                print(f"[yellow]{fore_window_info()}[/yellow]")
             case "LAG":
                 pass #TODO
             case _:
@@ -110,23 +111,23 @@ class Locker():
     def run(self,exit_event:Event)->None:
         while True:
             if exit_event.is_set():
-                print(f"locker {self.lock['name']}: EXIT")
+                print(f"locker {self.lock['name']}: [bold red]EXIT[/bold red]")
                 return
             if self.on is False:
                 sleep(Locker._off_int())
-                print(f"locker {self.lock['name']}: off")
+                print(f"locker {self.lock['name']}: [b]off[/b]")
                 continue
             if self.active is False:
                 sleep(Locker._idle_int())
-                print(f"locker {self.lock['name']}: idle")
+                print(f"locker {self.lock['name']}: [green]idle[/green]")
                 continue
             if self.violate is None:
                 sleep(Locker._active_int())
-                print(f"locker {self.lock['name']}: active")
+                print(f"locker {self.lock['name']}: [cyan]active[/cyan]")
                 continue
             self.punish(self.violate) # 这里再传一次violate是因为别的Lockers可能已经punish了，为了避免竞争
             sleep(Locker._active_int())
-            print(f"locker {self.lock['name']}: violate")
+            print(f"locker {self.lock['name']}: [magenta]violate[/magenta]")
 
 if __name__ == "__main__":
     locks:list[Locker]=[Locker(idx) for idx in config.keys("lockers")]
