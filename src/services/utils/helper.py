@@ -1,8 +1,10 @@
 from typing import Any, Optional, Callable, Union ,Sequence
 from textwrap import shorten
+from collections import namedtuple
 import time as tm
+from datetime import datetime,timedelta
 
-__all__ = ('shorten','Any', 'Optional', 'Callable', 'Union' ,'Sequence','singleton','dataclass','noexception','timeit','timeme','dprint')
+__all__ = ('shorten','Any', 'Optional', 'Callable', 'Union' ,'Sequence','singleton','dataclass','noexception','timeit','timeme','dprint','datetime','timedelta','namedtuple')
 
 def singleton(cls): # 类装饰器，给类加上单例模式    ！！必须放在其他类装饰器之上（之外） 因为他会把类退化成函数
     instances = {}  # TODO instances 的生命周期是不是全局的？
