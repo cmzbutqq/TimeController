@@ -60,7 +60,7 @@ class TaskTimer:
     
     
 """_summary_
-    TODO 任务记录表交互
+    TODO 重写任务记录表交互
 """
 import csv
 from task_timer import *
