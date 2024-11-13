@@ -120,13 +120,38 @@ class TaskRecorder:
                 right=left.replace(hour=23,minute=59,second=59,microsecond=999999)
         return ret
     
-    # TODO excel存入
+    # excel存入
+    path='data/task_rec.xlsx'
     
+    @staticmethod
+    def add_record(record:TaskRecord):
+        assert record.start.date()==record.end.date(), 'TaskRecord not splitted'
+        start=record.start.time()
+        end=record.end.time()
+        date=record.start.date()
+        sheet_name=str(date)
+    
+        wb = load_workbook(TaskRecorder.path)
+        if sheet_name not in wb.sheetnames:
+            ws = wb.create_sheet(sheet_name)
+        else:
+            ws = wb[sheet_name]
+        ws.append([record.task_id,
+                   start,
+                   end,
+                   record.valid_time,
+                   record.note
+                   ])
+        wb.save(TaskRecorder.path)
+        
+    def add_records(records:list[TaskRecord]):
+        for rec in records:
+            TaskRecorder.add_record(rec)
 
 if __name__ == '__main__':
     
     import random
-    VARY = 1e6
+    VARY = 2e6
     dur=timedelta(seconds=VARY*random.random())
     start=datetime.now()-0.7*dur
     end = datetime.now()+0.7*dur
@@ -134,5 +159,6 @@ if __name__ == '__main__':
     record=TaskRecorder.timer_record(status)
     records=TaskRecorder.rec_split(record)
     print(records)
-
+    TaskRecorder.add_records(records)
+    
     breakpoint()
