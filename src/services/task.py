@@ -6,6 +6,8 @@ from config import *
 from openpyxl import Workbook,load_workbook
 import os
 
+__all__= ('TimerStatus','TaskTimer','TaskRecord','TaskRecorder')
+
 TimerStatus = namedtuple('TimerStatus',('task_id','countdown','start','end','running','used_time')) # used_time指有效时间 暂停时不算
 class TaskTimer:
     def __init__(self,task_id:int,countdown_time:Optional[timedelta]=None):
