@@ -3,10 +3,14 @@ from services import *
 from rich.console import Console
 from rich.table import Table
 from rich.text import Text
+from rich.layout import Layout
+from rich.panel import Panel
 from rich.theme import Theme
+from rich.live import Live
 from rich.progress import track
 from rich.traceback import install
 from rich import print,inspect
+from rich import box
 install()
 console=Console()
 
@@ -14,9 +18,9 @@ def list2str(lst:list)->str:
     return ', '.join(map(str,lst))
 
 def cfg_tasks()->Table:
-    table = Table(title="Task List")
-    for col in ["id", "name", "note", "activate", "daily_aim", "weekly_aim", "monthly_aim", "deadline_aim","counter/timer"]:
-        table.add_column(col)
+    table = Table(title="Task List",expand=True,box=box.SIMPLE,border_style = "bright_yellow")
+    for col in ["id", "name", "note", "avail", "daily", "weekly", "monthly", "deadline","type"]:
+        table.add_column(col,overflow="fold")
     for task in config.get("count_tasks")():
         ddl=task["deadline_aim"]
         ddl=f"{ddl['aim']} times until: {ddl['date']}" if ddl is not None else "None"
@@ -28,7 +32,7 @@ def cfg_tasks()->Table:
     return table
 
 def cfg_locks()->Table:
-    table = Table(title="Lock List")
+    table = Table(title="Lock List",expand=True,box=box.SIMPLE,border_style = "bright_yellow")
     for col in ["name", "on", "punish", "list_type", "list", "time_rules"]:
         table.add_column(col)
     for lock in config.get("lockers")():
@@ -39,7 +43,7 @@ def cfg_locks()->Table:
     return table
 
 def cfg_presets()->Table:
-    table = Table(title="Preset List")
+    table = Table(title="Preset List",expand=True,box=box.SIMPLE,border_style = "bright_yellow")
     for col in ["key", "value"]:
         table.add_column(col)
     for k in config.keys("presets"):
@@ -47,7 +51,7 @@ def cfg_presets()->Table:
     return table
 
 def active_timers()->Table:
-    table = Table(title="Timer INSTANCES")
+    table = Table(title="Timer Instances",expand=True,box=box.SIMPLE,border_style = "bright_yellow")
     
     for col in ["task id","countdown", "start", "end", "running", "used time"]:
         table.add_column(col)
@@ -58,19 +62,41 @@ def active_timers()->Table:
     return table
 
 def active_lockers()->Table:
-    table= Table(title="Locker INSTANCES")
+    table= Table(title="Locker Instances",expand=True,box=box.SIMPLE,border_style = "bright_yellow")
     for col in ["status","thread"]:
         table.add_column(col)
     for lockers in Locker.instances:
         table.add_row(lockers.status, str(lockers.thread))
     return table
 
-def list_all():
-    print(cfg_tasks())
-    print(cfg_presets())
-    print(cfg_locks())
-    print(active_timers())
-    print(active_lockers())
+def show_cfg():
+    layout = Layout(name="root")
+    layout.split(
+        Layout(name="header", size=3),
+        Layout(name="body", ratio=1),
+    )
+    header=Panel(Text("CONFIGURATIONS",justify="center"),border_style="cyan")
+    body=Table.grid()
+    body.add_row(Panel(cfg_tasks()))
+    body.add_row(Panel(cfg_locks()))
+    body.add_row(Panel(cfg_presets()))
+    layout["header"].update(header)
+    layout["body"].update(body)
+    print(layout)
+
+def show_insts():
+    layout = Layout(name="root")
+    layout.split(
+        Layout(name="header", size=3),
+        Layout(name="body", ratio=1),
+    )
+    header=Panel(Text("INSTANCES",justify="center"),border_style="cyan")
+    body=Table.grid()
+    body.add_row(Panel(active_timers()))
+    body.add_row(Panel(active_lockers()))
+    layout["header"].update(header)
+    layout["body"].update(body)
+    print(layout)
 
 def demo_timer():
     TaskTimer(0)
@@ -85,35 +111,16 @@ def demo_timer():
     TaskTimer.stop_thread()
     print(active_timers())
     
-    
     TaskTimer.run_thread()
     for _ in range(2):
         sleep(1)
         print(active_timers())
     TaskTimer.stop_thread()
     print(active_timers())
-    
-    # t0=TaskTimer(0)
-    # t1=TaskTimer(1)
-    # t2=TaskTimer(2,timedelta(seconds=10))
-    # sleep(1)
-    # print(active_timers())
-    # del t0
-    # sleep(1)
-    # t1.stop()
-    # sleep(1)
-    # print(active_timers())
-    # del t1
-    # sleep(1)
-    # t2.stop()
-    # sleep(1)
-    # print(active_timers())
-    # del t2
-    # sleep(1)
-    # print(active_timers())
+
+locks:list[Locker]=[Locker(idx) for idx in config.keys("lockers")] 
 
 def demo_locker():
-    locks:list[Locker]=[Locker(idx) for idx in config.keys("lockers")] 
     print(active_lockers())
     for lock in locks:lock.start()
     sleep(1)
@@ -127,116 +134,36 @@ def demo_locker():
     for lock in locks:lock.stop() # 不要用 del 因为 del 能用不大可能
     sleep(1)
     print(active_lockers())
+
+def track_timers():
+    TaskTimer.run_thread()
+
+TaskTimer(1)
+
+def track_timers():
+    layout = Layout(name="root")
+    layout.split(
+        Layout(name="header", size=3),
+        Layout(name="body", ratio=1),
+    )
+    header=Panel(Text("RUNNING TIMERS",justify="center"),border_style="cyan")
+    layout["header"].update(header)
     
+    body=Table.grid()
+    body.add_row(Panel(active_timers()))
+    body.add_row(Panel(active_lockers()))
+    layout["body"].update(body)
+    print(layout)
 
 
 
-if __name__ == '__main__':
-    demo_timer()
+show_cfg()
+show_insts()
 
 
 
-# breakpoint()
 
-# {
-#   "lockers": [
-#     {
-#       "name": "控制",
-#       "on": false,
-#       "punish": "DEBUG",
-#       "list_type": "WHITELIST",
-#       "list": ["WHITE"],
-#       "time_rules": [
-#         {
-#           "start_time": "23:50",
-#           "end_time": "23:51",
-#           "days": ["1-5"]
-#         },
-#         {
-#           "start_time": "00:00",
-#           "end_time": "00:01",
-#           "days": ["6-7"]
-#         }
-#       ]
-#     },
-#     {
-#       "name": "守护进程",
-#       "on": false,
-#       "punish": "DEBUG",
-#       "list_type": "BLACKLIST",
-#       "list": ["BLACK"],
-#       "time_rules": [
-#         {
-#           "start_time": "23:50",
-#           "end_time": "23:51",
-#           "days": ["1-5"]
-#         },
-#         {
-#           "start_time": "00:00",
-#           "end_time": "00:01",
-#           "days": ["6-7"]
-#         }
-#       ]
-#     }
-#   ],
 
-#   "count_tasks": [
-#     {
-#       "id":0,
-#       "name": "运动",
-#       "note": "这是计数器的备注",
-#       "activate":true,
-#       "daily_aim": null,
-#       "weekly_aim": 4,
-#       "monthly_aim": 15,
-#       "deadline_aim": { "date": "2023-12-31", "aim": 100 }
-#     }
-#   ],
 
-#   "timer_tasks": [
-#     {
-#       "id":1,
-#       "name": "学习",
-#       "note": "这是计时器的备注",
-#       "activate":true,
-#       "counters": ["TIMERS", 80],
-#       "daily_aim": null,
-#       "weekly_aim": 300,
-#       "monthly_aim": 1500,
-#       "deadline_aim": null
-#     }
-#   ],
 
-#   "presets": {
-#     "BLACK": ["Taskmgr.exe", "mmc.exe"],
-#     "WHITE": [
-#       "LockApp.exe",
-#       "System Idle Process",
-#       "EXCEPTION",
-#       "StartMenuExperienceHost.exe",
-#       "SearchHost.exe",
-#       "coodesker-x64.exe",
-#       "explorer.exe",
-#       "QQ.exe",
-#       "WeChat.exe",
-#       "cloudmusic.exe"
-#     ],
-#     "TIMERS": [0, 5, 10, 20, 30, 45, 60],
-#     "1-5": [1, 2, 3, 4, 5],
-#     "6-7": [6, 7]
-#   },
-#   "settings":{
-#     "style": {},
-#     "preferences": {
-#       "run_as_admin": false,
-#       "auto_start": false
-#     },
-#     "debug": true,
-#     "advanced": {
-#       "lock_active_interval_sec": 1,
-#       "lock_idle_interval_sec": 2,
-#       "lock_off_interval_sec": 5,
-#       "timer_interval_sec": 0.5
-#     }
-#   }
-# }
+
