@@ -10,10 +10,10 @@ from rich import print
 install()
 console=Console()
 
-def list2str(lst:list):
+def list2str(lst:list)->str:
     return ', '.join(map(str,lst))
 
-def list_tasks():
+def cfg_tasks()->Table:
     table = Table(title="Task List")
     for col in ["id", "name", "note", "activate", "daily_aim", "weekly_aim", "monthly_aim", "deadline_aim","counter/timer"]:
         table.add_column(col)
@@ -25,9 +25,9 @@ def list_tasks():
         ddl=task["deadline_aim"]
         ddl=f"{ddl['aim']} mins until: {ddl['date']}" if ddl is not None else "None"
         table.add_row(str(task["id"]), task["name"], task["note"], str(task["activate"]), str(task["daily_aim"]), str(task["weekly_aim"]), str(task["monthly_aim"]),ddl,'timer')
-    console.print(table)
+    return table
 
-def list_locks():
+def cfg_locks()->Table:
     table = Table(title="Lock List")
     for col in ["name", "on", "punish", "list_type", "list", "time_rules"]:
         table.add_column(col)
@@ -36,17 +36,17 @@ def list_locks():
         for rule in lock["time_rules"]:
             rule_str += f"{rule['start_time']} - {rule['end_time']} | { list2str(rule['days'])}\n"
         table.add_row(lock["name"], str(lock["on"]), lock["punish"], lock["list_type"], str(*lock["list"]), rule_str)
-    console.print(table)
+    return table
 
-def list_presets():
+def cfg_presets()->Table:
     table = Table(title="Preset List")
     for col in ["key", "value"]:
         table.add_column(col)
     for k in config.keys("presets"):
         table.add_row(k, list2str(config.get("presets",k)()))
-    console.print(table)
+    return table
 
-def list_timers():
+def active_timers()->Table:
     table = Table(title="Active Timers")
     
     for col in ["task id","countdown", "start", "end", "running", "used time"]:
@@ -55,24 +55,59 @@ def list_timers():
         status:TimerStatus = timer.status
         cd:str= 'count up' if status.countdown is None else str(status.countdown)
         table.add_row(str(status.task_id), cd, str(status.start), str(status.end), str(status.running), str(status.used_time))
-    console.print(table)
+    return table
 
+def active_lockers()->Table:
+    table= Table(title="Active Lockers")
+    for col in ["status","thread"]:
+        table.add_column(col)
+    for lockers in Locker.instances:
+        table.add_row(lockers.status, str(lockers.thread))
+    return table
 
 def list_all():
-    list_tasks()
-    list_locks()
-    list_presets()
-    list_timers()
+    print(cfg_tasks())
+    print(cfg_presets())
+    print(cfg_locks())
+    print(active_timers())
+    print(active_lockers())
 
-t0=TaskTimer(0)
-t1=TaskTimer(1)
-t2=TaskTimer(2,helper.timedelta(seconds=10))
+def demo_timer():
+    t0=TaskTimer(0)
+    t1=TaskTimer(1)
+    t2=TaskTimer(2,helper.timedelta(seconds=10))
+    print(active_timers())
+    del t0
+    t1.stop()
+    print(active_timers())
+    del t1
+    t2.stop()
+    print(active_timers())
+    del t2
+    print(active_timers())
 
-del t0
-del t1
-list_timers()
+def demo_locker():
+    locks:list[Locker]=[Locker(idx) for idx in config.keys("lockers")]
+    print(active_lockers())
+    for lock in locks:lock.start()
+    helper.tm.sleep(1)
+    print(active_lockers())
+    for lock in locks:lock.stop()
+    helper.tm.sleep(1)
+    print(active_lockers())
+    for lock in locks:lock.start()
+    helper.tm.sleep(1)
+    print(active_lockers())
+    for lock in locks:lock.stop()
+    helper.tm.sleep(1)
+    print(active_lockers())
 
-# TimerStatus = namedtuple('TimerStatus',('task_id','countdown','start','end','running','used_time'))
+
+if __name__ == '__main__':
+    demo_locker()
+
+
+
 
 # breakpoint()
 

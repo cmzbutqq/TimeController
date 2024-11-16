@@ -19,8 +19,11 @@ class Locker():
     
     instances = weakref.WeakSet()
     
-    def __init__(self,index:int):
+    def __init__(self,index:int,stop_event:Optional[Event]=None):
         self._lock:Callable = config.get("lockers",index)
+        self.exit:Event     = Event() if stop_event is None else stop_event         # 主线程通过此变量通知子线程退出
+        self.thread:Thread  = Thread(target=self._run)                              # 子线程
+        self.status:str     =f"{self.lock['name']}: [bold red]THREAD NOT STARTED[/]"# 子线程记录自己的状态
         Locker.instances.add(self)
         
     @property
@@ -70,6 +73,10 @@ class Locker():
         return self.lock["on"]
     
     @property
+    def name(self)->str:
+        return self.lock["name"]
+    
+    @property
     def list_type(self)->str:
         return self.lock["list_type"]
     
@@ -90,7 +97,7 @@ class Locker():
                 raise ValueError(f"punish function {fname} not found")
     
     @property
-    def violate(self)->Optional[int]: # 当前进程是否违规 是则返回hwnd 否则None
+    def _violate(self)->Optional[int]: # 当前进程是否违规 是则返回hwnd 否则None
         (hwnd,_,_,pname) = fore_window_info()
         # print (pname)
         match self.list_type:
@@ -102,7 +109,7 @@ class Locker():
                 raise ValueError(f"list_type {self.list_type} illegal")
     
     @property
-    def active(self)->bool: # 当前时间是否在激活时间段 TODO testit
+    def _active(self)->bool: # 当前时间是否在激活时间段 TODO testit
         weekday = datetime.now().weekday() #周一0周日6
         now = datetime.now().time()
         durs = self.weekly_durs[weekday]
@@ -111,33 +118,44 @@ class Locker():
                 return True
         return False
         
-    def run(self,exit_event:Event)->None:
+    def _run(self)->None: # 子线程使用这个方法
         while True:
-            if exit_event.is_set():
-                print(f"locker {self.lock['name']}: [bold red]EXIT[/bold red]")
+            if self.exit.is_set():
+                self.status=f"{self.lock['name']}: [bold red]EXIT[/bold red]"
                 return
             if self.on is False:
+                self.status=f"{self.lock['name']}: [b]off[/b]"
                 sleep(Locker._off_int())
-                print(f"locker {self.lock['name']}: [b]off[/b]")
                 continue
-            if self.active is False:
+            if self._active is False:
+                self.status=f"{self.lock['name']}: [green]idle[/green]"
                 sleep(Locker._idle_int())
-                print(f"locker {self.lock['name']}: [green]idle[/green]")
                 continue
-            if self.violate is None:
+            if self._violate is None:
+                self.status=f"{self.lock['name']}: [cyan]active[/cyan]"
                 sleep(Locker._active_int())
-                print(f"locker {self.lock['name']}: [cyan]active[/cyan]")
                 continue
-            self.punish(self.violate) # 这里再传一次violate是因为别的Lockers可能已经punish了，为了避免竞争
+            self.punish(self._violate) # 这里再传一次violate是因为别的Lockers可能已经punish了，为了避免竞争
+            self.status=f"{self.lock['name']}: [magenta]violate[/magenta]"
             sleep(Locker._active_int())
-            print(f"locker {self.lock['name']}: [magenta]violate[/magenta]")
+            
+    def start(self): # 主线程使用这个方法
+        self.thread.start()
+        
+    def stop(self): # 主线程使用这个方法
+        self.exit.set()
+        self.thread.join()
+        self.exit.clear()                               # 重置exit
+        self.thread:Thread  = Thread(target=self._run)  # 重置thread
+        print("[reverse]thread joined[/]")              # 之后还能再次start
+
 
 if __name__ == "__main__":
     locks:list[Locker]=[Locker(idx) for idx in config.keys("lockers")]
-    exit=Event()
-    threads=[Thread(target=lock.run,args=(exit,)) for lock in locks]
-    [thread.start() for thread in threads]
-    sleep(10)
-    exit.set()
-    [thread.join() for thread in threads]
+    # exit=Event()
+    # threads=[Thread(target=lock.run,args=(exit,)) for lock in locks]
+    # [thread.start() for thread in threads]
+    # sleep(10)
+    # exit.set()
+    # [thread.join() for thread in threads]
         

@@ -21,7 +21,7 @@
     },
     {
       "name": "守护进程",
-      "on": false,
+      "on": true,
       "punish": "DEBUG",
       "list_type": "BLACKLIST",
       "list": ["BLACK"],
