@@ -10,6 +10,8 @@ from rich import print
 install()
 console=Console()
 
+def list2str(lst:list):
+    return ', '.join(map(str,lst))
 
 def list_tasks():
     table = Table(title="Task List")
@@ -24,7 +26,7 @@ def list_tasks():
         ddl=f"{ddl['aim']} mins until: {ddl['date']}" if ddl is not None else "None"
         table.add_row(str(task["id"]), task["name"], task["note"], str(task["activate"]), str(task["daily_aim"]), str(task["weekly_aim"]), str(task["monthly_aim"]),ddl,'timer')
     console.print(table)
-        
+
 def list_locks():
     table = Table(title="Lock List")
     for col in ["name", "on", "punish", "list_type", "list", "time_rules"]:
@@ -32,20 +34,46 @@ def list_locks():
     for lock in config.get("lockers")():
         rule_str = ''
         for rule in lock["time_rules"]:
-            rule_str += f"{rule['start_time']} - {rule['end_time']} | {rule['days']}\n"
+            rule_str += f"{rule['start_time']} - {rule['end_time']} | { list2str(rule['days'])}\n"
         table.add_row(lock["name"], str(lock["on"]), lock["punish"], lock["list_type"], str(*lock["list"]), rule_str)
     console.print(table)
 
 def list_presets():
     table = Table(title="Preset List")
-    for col in ["name", "list"]:
+    for col in ["key", "value"]:
         table.add_column(col)
-    for preset in config.get("presets")():
-        pass
+    for k in config.keys("presets"):
+        table.add_row(k, list2str(config.get("presets",k)()))
+    console.print(table)
+
+def list_timers():
+    table = Table(title="Active Timers")
     
-    
-list_tasks()
-list_locks()
+    for col in ["task id","countdown", "start", "end", "running", "used time"]:
+        table.add_column(col)
+    for timer in TaskTimer.instances:
+        status:TimerStatus = timer.status
+        cd:str= 'count up' if status.countdown is None else str(status.countdown)
+        table.add_row(str(status.task_id), cd, str(status.start), str(status.end), str(status.running), str(status.used_time))
+    console.print(table)
+
+
+def list_all():
+    list_tasks()
+    list_locks()
+    list_presets()
+    list_timers()
+
+t0=TaskTimer(0)
+t1=TaskTimer(1)
+t2=TaskTimer(2,helper.timedelta(seconds=10))
+
+del t0
+del t1
+list_timers()
+
+# TimerStatus = namedtuple('TimerStatus',('task_id','countdown','start','end','running','used_time'))
+
 # breakpoint()
 
 # {

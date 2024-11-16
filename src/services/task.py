@@ -12,7 +12,7 @@ TimerStatus = namedtuple('TimerStatus',('task_id','countdown','start','end','run
 class TaskTimer:
     instances = weakref.WeakSet()
     
-    def __new__(self,task_id:int,countdown_time:Optional[timedelta]=None):
+    def __init__(self,task_id:int,countdown_time:Optional[timedelta]=None):
         self.task_id = task_id # 任务id
         self.countdown = countdown_time  # 倒计时设定时间,None表示正计时
         self.start = datetime.now() # 任务开始时间
