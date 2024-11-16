@@ -51,9 +51,21 @@
       "monthly_aim": 15,
       "deadline_aim": { "date": "2023-12-31", "aim": 100 }
     }
+
   ],
 
   "timer_tasks": [
+    {
+      "id": 1,
+      "name": "学习",
+      "note": "这是计时器的备注",
+      "activate": true,
+      "counters": ["TIMERS", 25],
+      "daily_aim": null,
+      "weekly_aim": 300,
+      "monthly_aim": 1500,
+      "deadline_aim": { "date": "2023-12-31", "aim": 1000 }
+    },
     {
       "id": 1,
       "name": "学习",
@@ -63,7 +75,18 @@
       "daily_aim": null,
       "weekly_aim": 300,
       "monthly_aim": 1500,
-      "deadline_aim": null
+      "deadline_aim": { "date": "2023-12-31", "aim": 1000 }
+    },
+    {
+      "id": 1,
+      "name": "学习",
+      "note": "这是计时器的备注",
+      "activate": true,
+      "counters": ["TIMERS", 80],
+      "daily_aim": null,
+      "weekly_aim": 300,
+      "monthly_aim": 1500,
+      "deadline_aim": { "date": "2023-12-31", "aim": 1000 }
     }
   ],
 

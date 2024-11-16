@@ -1,8 +1,8 @@
 """_summary_
     任务计时器
 """
-from utils.helper import *
-from config import *
+from .utils.helper import *
+from .config import *
 from openpyxl import Workbook,load_workbook
 import os
 

@@ -2,7 +2,7 @@
     配置文件交互
 """
 import json
-from utils.helper import *
+from .utils.helper import *
 
 __all__ = ("cfg_path","jval_t","jkey_t","Config","config")
 
