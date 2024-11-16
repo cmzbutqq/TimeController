@@ -10,13 +10,16 @@ __all__= ('TimerStatus','TaskTimer','TaskRecord','TaskRecorder')
 
 TimerStatus = namedtuple('TimerStatus',('task_id','countdown','start','end','running','used_time')) # used_time指有效时间 暂停时不算
 class TaskTimer:
-    def __init__(self,task_id:int,countdown_time:Optional[timedelta]=None):
+    instances = weakref.WeakSet()
+    
+    def __new__(self,task_id:int,countdown_time:Optional[timedelta]=None):
         self.task_id = task_id # 任务id
         self.countdown = countdown_time  # 倒计时设定时间,None表示正计时
         self.start = datetime.now() # 任务开始时间
         self.run = True   # 任务是暂停还是运行
         self.end = None  # 任务结束时间,None表示未结束
         self._last = [datetime.now(),timedelta(0)] # 上次暂停/恢复时的 时间和已用时间
+        TaskTimer.instances.add(self)
     
     def resume(self)->None:
         if self.end is not None:
@@ -147,7 +150,8 @@ class TaskRecorder:
                    ])
         
         wb.save(TaskRecorder.path)
-        
+    
+    @staticmethod
     def add_records(records:list[TaskRecord]):
         for rec in records:
             TaskRecorder.add_record(rec)

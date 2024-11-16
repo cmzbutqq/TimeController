@@ -17,8 +17,12 @@ class Locker():
     _idle_int:Callable = config.get("settings","advanced","lock_idle_interval_sec")
     _off_int:Callable = config.get("settings","advanced","lock_off_interval_sec")
     
+    instances = weakref.WeakSet()
+    
     def __init__(self,index:int):
         self._lock:Callable = config.get("lockers",index)
+        Locker.instances.add(self)
+        
     @property
     def lock(self)->dict:
         return self._lock()
