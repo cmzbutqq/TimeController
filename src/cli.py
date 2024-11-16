@@ -6,7 +6,7 @@ from rich.text import Text
 from rich.theme import Theme
 from rich.progress import track
 from rich.traceback import install
-from rich import print
+from rich import print,inspect
 install()
 console=Console()
 
@@ -47,7 +47,7 @@ def cfg_presets()->Table:
     return table
 
 def active_timers()->Table:
-    table = Table(title="Active Timers")
+    table = Table(title="Timer INSTANCES")
     
     for col in ["task id","countdown", "start", "end", "running", "used time"]:
         table.add_column(col)
@@ -58,7 +58,7 @@ def active_timers()->Table:
     return table
 
 def active_lockers()->Table:
-    table= Table(title="Active Lockers")
+    table= Table(title="Locker INSTANCES")
     for col in ["status","thread"]:
         table.add_column(col)
     for lockers in Locker.instances:
@@ -73,39 +73,66 @@ def list_all():
     print(active_lockers())
 
 def demo_timer():
-    t0=TaskTimer(0)
-    t1=TaskTimer(1)
-    t2=TaskTimer(2,helper.timedelta(seconds=10))
+    TaskTimer(0)
+    TaskTimer(1,timedelta(seconds=2))
+    TaskTimer(2,timedelta(seconds=5))
+    
     print(active_timers())
-    del t0
-    t1.stop()
+    TaskTimer.run_thread()
+    for _ in range(5):
+        sleep(2)
+        print(active_timers())
+    TaskTimer.stop_thread()
     print(active_timers())
-    del t1
-    t2.stop()
+    
+    
+    TaskTimer.run_thread()
+    for _ in range(2):
+        sleep(1)
+        print(active_timers())
+    TaskTimer.stop_thread()
     print(active_timers())
-    del t2
-    print(active_timers())
+    
+    # t0=TaskTimer(0)
+    # t1=TaskTimer(1)
+    # t2=TaskTimer(2,timedelta(seconds=10))
+    # sleep(1)
+    # print(active_timers())
+    # del t0
+    # sleep(1)
+    # t1.stop()
+    # sleep(1)
+    # print(active_timers())
+    # del t1
+    # sleep(1)
+    # t2.stop()
+    # sleep(1)
+    # print(active_timers())
+    # del t2
+    # sleep(1)
+    # print(active_timers())
 
 def demo_locker():
-    locks:list[Locker]=[Locker(idx) for idx in config.keys("lockers")]
+    locks:list[Locker]=[Locker(idx) for idx in config.keys("lockers")] 
     print(active_lockers())
     for lock in locks:lock.start()
-    helper.tm.sleep(1)
+    sleep(1)
     print(active_lockers())
     for lock in locks:lock.stop()
-    helper.tm.sleep(1)
+    sleep(1)
     print(active_lockers())
     for lock in locks:lock.start()
-    helper.tm.sleep(1)
+    sleep(1)
     print(active_lockers())
-    for lock in locks:lock.stop()
-    helper.tm.sleep(1)
+    for lock in locks:lock.stop() # 不要用 del 因为 del 能用不大可能
+    sleep(1)
     print(active_lockers())
+    
+
 
 
 if __name__ == '__main__':
-    demo_locker()
-
+    demo_timer()
 
 
 
