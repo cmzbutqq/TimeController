@@ -83,7 +83,7 @@ class TaskTimer:
                 else:
                     pass
                     # print(TaskTimer.instances[i].__str__())
-            sleep(interval)
+            # sleep(interval) #TODO 
         
         for i in range(len(TaskTimer.instances) - 1, -1, -1): # exit时停止并保存所有计时器
             TaskTimer.instances[i].stop()

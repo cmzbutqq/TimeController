@@ -32,7 +32,7 @@ class Config:
         if path is None:
             path=self.pth
         with open(path, "w", encoding="utf-8") as f:
-            json.dump(self.cfg, f, indent=4, ensure_ascii=False)
+            json.dump(self.cfg, f, indent=2, ensure_ascii=False)
             self.pth = path # 注意：会更新pth路径
     
     # def unsafe_get(self,*keys)->jval_t: # 通过keys找到值 这个值是引用 更改会同步到self.cfg里面

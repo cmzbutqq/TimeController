@@ -144,7 +144,8 @@ class Locker():
         
     def stop(self): # 主线程使用这个方法
         self.exit.set()
-        self.thread.join()
+        if self.thread.is_alive():
+            self.thread.join()
         self.exit.clear()                               # 重置exit
         self.thread:Thread  = Thread(target=self._run)  # 重置thread
         print("[reverse]thread joined[/]")              # 之后还能再次start
