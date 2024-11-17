@@ -72,16 +72,18 @@ class TaskTimer:
     def _run(): # 类的子线程使用这个方法
         def wq(i:int): # 写入表格并删除实例
             TaskRecorder.add_records(TaskRecorder.rec_split(TaskRecorder.timer_record(TaskTimer.instances[i].status)))
-            print(f"[reverse]recorded[/]: {TaskTimer.instances[i].status.task_id}")
+            # print(f"[reverse]recorded[/]: {TaskTimer.instances[i].status.task_id}")
             del TaskTimer.instances[i]
         
+        interval=config.get('settings','advanced','timer_interval_sec')()
         while not TaskTimer.exit.is_set():
             for i in range(len(TaskTimer.instances) - 1, -1, -1): #遍历类的所有实例
                 if TaskTimer.instances[i].status.end is not None:
                     wq(i)
                 else:
-                    print(TaskTimer.instances[i].__str__())
-            sleep(config.get('settings','advanced','timer_interval_sec')())
+                    pass
+                    # print(TaskTimer.instances[i].__str__())
+            sleep(interval)
         
         for i in range(len(TaskTimer.instances) - 1, -1, -1): # exit时停止并保存所有计时器
             TaskTimer.instances[i].stop()

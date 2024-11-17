@@ -7,12 +7,24 @@ from rich.layout import Layout
 from rich.panel import Panel
 from rich.theme import Theme
 from rich.live import Live
-from rich.progress import track
+from rich.progress import BarColumn, Progress, SpinnerColumn, TextColumn
+from rich.spinner import Spinner
 from rich.traceback import install
 from rich import print,inspect
 from rich import box
 install()
 console=Console()
+
+command=None #主线程根据这个变量决定是否切换显示界面
+
+
+def get_name(task_id:int)->str:
+    for task in config.get("count_tasks")():
+        if task["id"]==task_id:
+            return task["name"]
+    for task in config.get("timer_tasks")():
+        if task["id"]==task_id:
+            return task["name"]
 
 def list2str(lst:list)->str:
     return ', '.join(map(str,lst))
@@ -135,12 +147,13 @@ def demo_locker():
     sleep(1)
     print(active_lockers())
 
+TaskTimer(3)
+TaskTimer(4,timedelta(seconds=2))
+TaskTimer(5,timedelta(seconds=5))
+TaskTimer(6,timedelta(seconds=10))
+
 def track_timers():
     TaskTimer.run_thread()
-
-TaskTimer(1)
-
-def track_timers():
     layout = Layout(name="root")
     layout.split(
         Layout(name="header", size=3),
@@ -149,16 +162,51 @@ def track_timers():
     header=Panel(Text("RUNNING TIMERS",justify="center"),border_style="cyan")
     layout["header"].update(header)
     
-    body=Table.grid()
-    body.add_row(Panel(active_timers()))
-    body.add_row(Panel(active_lockers()))
-    layout["body"].update(body)
-    print(layout)
+
+    
+    start_time = datetime.now()
+    with Live(layout, refresh_per_second=100) as live:
+        while datetime.now()-start_time<timedelta(seconds=15):
+            body=Table.grid()
+            for timer in TaskTimer.instances:
+                status:TimerStatus=timer.status
+                name=get_name(status.task_id)
+                # if status.end is not None:
+                #     continue
+                grid=Table.grid()
+                if status.countdown is None:
+                    used=TaskRecorder.floor_dur(status.used_time)
+                    speed=1 if status.running else 0
+                    running = Spinner("dots",speed=speed)
+                    grid.add_row(
+                        Text(name+' '),
+                        running,
+                        Text(' '+str(used)),
+                        )
+                else:
+                    cd=status.countdown
+                    used=TaskRecorder.floor_dur(status.used_time)
+                    speed=1 if status.running else 0
+                    running = Spinner("dots",speed=speed)
+                    percentage=round(status.used_time/status.countdown*100,1)
+                    grid.add_row(
+                        Text(name+' '),
+                        running,
+                        Text(f" {used}/{cd} - {percentage}%"),
+                    )
+                
+                body.add_row(Panel(grid,border_style="cyan"))
+                
+                
+                
+            layout["body"].update(body)
+            if datetime.now()-start_time>timedelta(seconds=14):
+                TaskTimer.stop_thread()
+                start_time-=timedelta(seconds=2)
 
 
 
-show_cfg()
-show_insts()
+track_timers()
 
 
 
@@ -166,4 +214,181 @@ show_insts()
 
 
 
+
+# {
+#   "lockers": [
+#     {
+#       "name": "控制",
+#       "on": true,
+#       "punish": "DEBUG",
+#       "list_type": "WHITELIST",
+#       "list": ["WHITE"],
+#       "time_rules": [
+#         {
+#           "start_time": "23:10",
+#           "end_time": "06:00",
+#           "days": ["1-5"]
+#         },
+#         {
+#           "start_time": "23:30",
+#           "end_time": "06:00",
+#           "days": ["6-7"]
+#         }
+#       ]
+#     },
+#     {
+#       "name": "守护进程",
+#       "on": true,
+#       "punish": "DEBUG",
+#       "list_type": "BLACKLIST",
+#       "list": ["BLACK"],
+#       "time_rules": [
+#         {
+#           "start_time": "23:00",
+#           "end_time": "23:50",
+#           "days": ["1-5"]
+#         },
+#         {
+#           "start_time": "23:00",
+#           "end_time": "23:30",
+#           "days": ["6-7"]
+#         }
+#       ]
+#     }
+#   ],
+
+#   "count_tasks": [
+#     {
+#       "id": 0,
+#       "name": "跑步",
+#       "note": "1km以上作数",
+#       "activate": true,
+#       "daily_aim": null,
+#       "weekly_aim": 4,
+#       "monthly_aim": 15,
+#       "deadline_aim": { "date": "2024-12-31", "aim": 100 }
+#     },
+#     {
+#       "id": 1,
+#       "name": "跳绳",
+#       "note": "累计400次作数",
+#       "activate": true,
+#       "daily_aim": null,
+#       "weekly_aim": 4,
+#       "monthly_aim": 15,
+#       "deadline_aim": null
+#     },
+#     {
+#       "id": 2,
+#       "name": "完成期末论文",
+#       "note": "",
+#       "activate": true,
+#       "daily_aim": null,
+#       "weekly_aim": null,
+#       "monthly_aim": null,
+#       "deadline_aim": null
+#     },
+#     {
+#       "id": 8,
+#       "name": "保养自行车",
+#       "note": "打气 润滑 水洗",
+#       "activate": true,
+#       "daily_aim": null,
+#       "weekly_aim": null,
+#       "monthly_aim": 1,
+#       "deadline_aim": null
+#     }
+#   ],
+
+#   "timer_tasks": [
+#     {
+#       "id": 3,
+#       "name": "课上学习",
+#       "note": "完成课上的作业等",
+#       "activate": true,
+#       "timers": ["TIMERS"],
+#       "daily_aim": null,
+#       "weekly_aim": 100,
+#       "monthly_aim": null,
+#       "deadline_aim": null
+#     },
+#     {
+#       "id": 4,
+#       "name": "自学",
+#       "note": "看网课，学自己喜欢的",
+#       "activate": true,
+#       "timers": ["TIMERS", 80],
+#       "daily_aim": null,
+#       "weekly_aim": 300,
+#       "monthly_aim": 1500,
+#       "deadline_aim": { "date": "2024-12-31", "aim": 1000 }
+#     },
+#     {
+#       "id": 5,
+#       "name": "游戏",
+#       "note": "拯救电子ED",
+#       "activate": true,
+#       "timers": ["TIMERS"],
+#       "daily_aim": null,
+#       "weekly_aim": 200,
+#       "monthly_aim": null,
+#       "deadline_aim": null
+#     },
+#     {
+#       "id": 6,
+#       "name": "看剧",
+#       "note": "陶冶情操",
+#       "activate": true,
+#       "timers": ["TIMERS"],
+#       "daily_aim": null,
+#       "weekly_aim": 200,
+#       "monthly_aim": null,
+#       "deadline_aim": null
+#     },
+#     {
+#       "id": 7,
+#       "name": "弹琴",
+#       "note": "优雅永不过时",
+#       "activate": true,
+#       "timers": ["TIMERS"],
+#       "daily_aim": null,
+#       "weekly_aim": 200,
+#       "monthly_aim": null,
+#       "deadline_aim": { "date": "2024-12-31", "aim": 1000 }
+#     }
+#   ],
+
+#   "presets": {
+#     "BLACK": ["Taskmgr.exe", "mmc.exe"],
+#     "WHITE": [
+#       "LockApp.exe",
+#       "System Idle Process",
+#       "EXCEPTION",
+#       "StartMenuExperienceHost.exe",
+#       "SearchHost.exe",
+#       "coodesker-x64.exe",
+#       "explorer.exe",
+#       "QQ.exe",
+#       "WeChat.exe",
+#       "cloudmusic.exe"
+#     ],
+#     "TIMERS": [0, 5, 10, 20, 30, 45, 60],
+#     "1-5": [1, 2, 3, 4, 5],
+#     "6-7": [6, 7]
+#   },
+#   "settings": {
+#     "style": {},
+#     "preferences": {
+#       "run_as_admin": false,
+#       "auto_start": false
+#     },
+#     "debug": true,
+#     "advanced": {
+#       "lock_active_interval_sec": 1,
+#       "lock_idle_interval_sec": 2,
+#       "lock_off_interval_sec": 5,
+#       "timer_interval_sec": 0.5
+#     }
+#   }
+# }
 
