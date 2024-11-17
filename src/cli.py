@@ -467,10 +467,10 @@ def menu():
                     keybd_command,stage_command=None,"quit"
                     return
 
-TaskTimer(3)
-TaskTimer(4,timedelta(seconds=2))
-TaskTimer(5,timedelta(seconds=5))
-TaskTimer(6,timedelta(seconds=10))
+# TaskTimer(3)
+# TaskTimer(4,timedelta(seconds=2))
+# TaskTimer(5,timedelta(seconds=5))
+# TaskTimer(6,timedelta(seconds=10))
 
 stage_command="menu"
 
