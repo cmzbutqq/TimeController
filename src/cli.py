@@ -135,11 +135,6 @@ def show_insts():
             pass
     keybd_command,stage_command=None,"menu"
 
-TaskTimer(3)
-TaskTimer(4,timedelta(seconds=2))
-TaskTimer(5,timedelta(seconds=5))
-TaskTimer(6,timedelta(seconds=10))
-
 def remove_task():
     global keybd_command,stage_command
     stage_command=None
@@ -321,6 +316,45 @@ def add_task():
     
     keybd_command,stage_command=None,"show_cfg"
 
+def start_timer():
+    global keybd_command,stage_command
+    stage_command=None
+    
+    _=input("press enter to continue:")
+
+    id=int(input("task id: "))
+    
+    for task in config.get("count_tasks")():
+        if task["id"]==id:
+            note=input('any note? : ')
+            TaskRecorder.add_record(TaskRecorder.counter_record(id,datetime.now(),note))
+            name=task["name"]
+            
+            print(f"Count Task {name} recorded")
+            sleep(1)
+            
+            keybd_command,stage_command=None,"menu"
+            return
+    for task in config.get("timer_tasks")():
+        if task["id"]==id:
+            timers=task['timers']
+            print("timer presets:"+list2str(timers))
+            time=input("choose length:")
+            time=int(time.strip())
+            time=None if time==0 else timedelta(minutes=time)
+            TaskTimer(id,time)
+
+            print("timer started")
+            sleep(1)
+
+            keybd_command,stage_command=None,"menu"
+            return
+        
+    print("Unknown Task")
+    sleep(1)
+    
+    keybd_command,stage_command=None,"menu"
+    
 def track_timers():
     global keybd_command,stage_command
     stage_command=None
@@ -381,6 +415,10 @@ def track_timers():
     TaskTimer.stop_thread()
     keybd_command,stage_command=None,"menu"
 
+
+
+    
+
 def menu():
     global keybd_command,stage_command
     keybd_command,stage_command=None,None
@@ -395,7 +433,7 @@ def menu():
                     5.remove task
                     6:add locker
                     7.remove locker
-                    8.show_records"""
+                    8.start timer"""
                     ,justify="left",style="bold"),border_style="cyan")
     layout["body"].update(body)
     with Live(layout, refresh_per_second=10,screen=True) as live:
@@ -422,9 +460,17 @@ def menu():
                 case "7":
                     keybd_command,stage_command=None,"remove_locker"
                     return
+                case "8":
+                    keybd_command,stage_command=None,"start_timer"
+                    return
                 case "q":
                     keybd_command,stage_command=None,"quit"
                     return
+
+TaskTimer(3)
+TaskTimer(4,timedelta(seconds=2))
+TaskTimer(5,timedelta(seconds=5))
+TaskTimer(6,timedelta(seconds=10))
 
 stage_command="menu"
 
@@ -446,228 +492,10 @@ while stage_command!="quit":
             add_locker()
         case "add_task":
             add_task()
+        case "start_timer":
+            start_timer()
         case None:
             continue
         case _:
             print(f"unknown command:{stage_command}")
-
-# def demo_timer():
-#     TaskTimer(0)
-#     TaskTimer(1,timedelta(seconds=2))
-#     TaskTimer(2,timedelta(seconds=5))
-    
-#     print(active_timers())
-#     TaskTimer.run_thread()
-#     for _ in range(5):
-#         sleep(2)
-#         print(active_timers())
-#     TaskTimer.stop_thread()
-#     print(active_timers())
-    
-#     TaskTimer.run_thread()
-#     for _ in range(2):
-#         sleep(1)
-#         print(active_timers())
-#     TaskTimer.stop_thread()
-#     print(active_timers())
-
-# def demo_locker():
-#     print(active_lockers())
-#     for lock in locks:lock.start()
-#     sleep(1)
-#     print(active_lockers())
-#     for lock in locks:lock.stop()
-#     sleep(1)
-#     print(active_lockers())
-#     for lock in locks:lock.start()
-#     sleep(1)
-#     print(active_lockers())
-#     for lock in locks:lock.stop() # 不要用 del 因为 del 能用不大可能
-#     sleep(1)
-#     print(active_lockers())
-
-
-
-
-
-
-
-
-
-# {
-#   "lockers": [
-#     {
-#       "name": "控制",
-#       "on": true,
-#       "punish": "DEBUG",
-#       "list_type": "WHITELIST",
-#       "list": ["WHITE"],
-#       "time_rules": [
-#         {
-#           "start_time": "23:10",
-#           "end_time": "06:00",
-#           "days": ["1-5"]
-#         },
-#         {
-#           "start_time": "23:30",
-#           "end_time": "06:00",
-#           "days": ["6-7"]
-#         }
-#       ]
-#     },
-#     {
-#       "name": "守护进程",
-#       "on": true,
-#       "punish": "DEBUG",
-#       "list_type": "BLACKLIST",
-#       "list": ["BLACK"],
-#       "time_rules": [
-#         {
-#           "start_time": "23:00",
-#           "end_time": "23:50",
-#           "days": ["1-5"]
-#         },
-#         {
-#           "start_time": "23:00",
-#           "end_time": "23:30",
-#           "days": ["6-7"]
-#         }
-#       ]
-#     }
-#   ],
-
-#   "count_tasks": [
-#     {
-#       "id": 0,
-#       "name": "跑步",
-#       "note": "1km以上作数",
-#       "activate": true,
-#       "daily_aim": null,
-#       "weekly_aim": 4,
-#       "monthly_aim": 15,
-#       "deadline_aim": { "date": "2024-12-31", "aim": 100 }
-#     },
-#     {
-#       "id": 1,
-#       "name": "跳绳",
-#       "note": "累计400次作数",
-#       "activate": true,
-#       "daily_aim": null,
-#       "weekly_aim": 4,
-#       "monthly_aim": 15,
-#       "deadline_aim": null
-#     },
-#     {
-#       "id": 2,
-#       "name": "完成期末论文",
-#       "note": "",
-#       "activate": true,
-#       "daily_aim": null,
-#       "weekly_aim": null,
-#       "monthly_aim": null,
-#       "deadline_aim": null
-#     },
-#     {
-#       "id": 8,
-#       "name": "保养自行车",
-#       "note": "打气 润滑 水洗",
-#       "activate": true,
-#       "daily_aim": null,
-#       "weekly_aim": null,
-#       "monthly_aim": 1,
-#       "deadline_aim": null
-#     }
-#   ],
-
-#   "timer_tasks": [
-#     {
-#       "id": 3,
-#       "name": "课上学习",
-#       "note": "完成课上的作业等",
-#       "activate": true,
-#       "timers": ["TIMERS"],
-#       "daily_aim": null,
-#       "weekly_aim": 100,
-#       "monthly_aim": null,
-#       "deadline_aim": null
-#     },
-#     {
-#       "id": 4,
-#       "name": "自学",
-#       "note": "看网课，学自己喜欢的",
-#       "activate": true,
-#       "timers": ["TIMERS", 80],
-#       "daily_aim": null,
-#       "weekly_aim": 300,
-#       "monthly_aim": 1500,
-#       "deadline_aim": { "date": "2024-12-31", "aim": 1000 }
-#     },
-#     {
-#       "id": 5,
-#       "name": "游戏",
-#       "note": "拯救电子ED",
-#       "activate": true,
-#       "timers": ["TIMERS"],
-#       "daily_aim": null,
-#       "weekly_aim": 200,
-#       "monthly_aim": null,
-#       "deadline_aim": null
-#     },
-#     {
-#       "id": 6,
-#       "name": "看剧",
-#       "note": "陶冶情操",
-#       "activate": true,
-#       "timers": ["TIMERS"],
-#       "daily_aim": null,
-#       "weekly_aim": 200,
-#       "monthly_aim": null,
-#       "deadline_aim": null
-#     },
-#     {
-#       "id": 7,
-#       "name": "弹琴",
-#       "note": "优雅永不过时",
-#       "activate": true,
-#       "timers": ["TIMERS"],
-#       "daily_aim": null,
-#       "weekly_aim": 200,
-#       "monthly_aim": null,
-#       "deadline_aim": { "date": "2024-12-31", "aim": 1000 }
-#     }
-#   ],
-
-#   "presets": {
-#     "BLACK": ["Taskmgr.exe", "mmc.exe"],
-#     "WHITE": [
-#       "LockApp.exe",
-#       "System Idle Process",
-#       "EXCEPTION",
-#       "StartMenuExperienceHost.exe",
-#       "SearchHost.exe",
-#       "coodesker-x64.exe",
-#       "explorer.exe",
-#       "QQ.exe",
-#       "WeChat.exe",
-#       "cloudmusic.exe"
-#     ],
-#     "TIMERS": [0, 5, 10, 20, 30, 45, 60],
-#     "1-5": [1, 2, 3, 4, 5],
-#     "6-7": [6, 7]
-#   },
-#   "settings": {
-#     "style": {},
-#     "preferences": {
-#       "run_as_admin": false,
-#       "auto_start": false
-#     },
-#     "debug": true,
-#     "advanced": {
-#       "lock_active_interval_sec": 1,
-#       "lock_idle_interval_sec": 2,
-#       "lock_off_interval_sec": 5,
-#       "timer_interval_sec": 0.5
-#     }
-#   }
-# }
-
+    console.clear()
