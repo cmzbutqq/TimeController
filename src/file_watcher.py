@@ -1,9 +1,11 @@
 """
 这个文件用来监视user.json文件的变化，如果变化，就会重新加载config
 """
+
 import time
 import os
 import threading
+
 
 class FileWatcher:
     def __init__(self, filepath, callback, stop_event=None):
@@ -13,7 +15,9 @@ class FileWatcher:
         self.stop_event = stop_event or threading.Event()
 
     def watch(self):
-        while not self.stop_event.is_set():  # 检查 stop_event 是否设置
+        while (
+            not self.stop_event.is_set()
+        ):  # 检查 stop_event 是否设置
             try:
                 current_modified = os.path.getmtime(self.filepath)
                 if current_modified != self.last_modified:

@@ -31,7 +31,9 @@ def load_locks_from_config():
         for locker in lockers:
             if locker.thread.is_alive():
                 locker.thread.join()
-        print("[green]All existing lockers stopped and joined.[/green]")
+        print(
+            "[green]All existing lockers stopped and joined.[/green]"
+        )
 
     # 清空全局变量
     lockers = []
@@ -41,7 +43,9 @@ def load_locks_from_config():
     for locker in lockers:
         if locker.on:
             locker.start()
-            print(f"[blue]Locker {locker.name} started successfully.[/blue]")
+            print(
+                f"[blue]Locker {locker.name} started successfully.[/blue]"
+            )
 
 
 def create_and_start_lockers():
@@ -51,6 +55,7 @@ def create_and_start_lockers():
         if locker.on:
             locker.start()
 
+
 def stop_and_join_lockers():
     global lockers
     for locker in lockers:
@@ -58,6 +63,7 @@ def stop_and_join_lockers():
     for locker in lockers:
         if locker.thread.is_alive():
             locker.thread.join()
+
 
 if __name__ == "__main__":
     create_and_start_lockers()

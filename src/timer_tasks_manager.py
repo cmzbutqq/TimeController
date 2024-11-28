@@ -1,4 +1,4 @@
-from services import TaskTimer,TaskRecorder,TimerStatus
+from services import TaskTimer, TaskRecorder, TimerStatus
 from services import config
 from typing import Dict, List, Optional
 import json
@@ -8,36 +8,56 @@ from openpyxl import Workbook
 from openpyxl.utils import get_column_letter
 import datetime
 
+
 class TimerTasksManager:
-    def __init__(self,app):
+    def __init__(self, app):
         self.timers: Dict[int, TimerStatus] = {}
         self.load_timers()
         self.app = app
 
     def load_timers(self):
         """从配置文件加载计时器任务实例"""
-        timer_tasks = config.get('timer_tasks')()
+        timer_tasks = config.get("timer_tasks")()
         for task in timer_tasks:
-            task_id = task['id']
-            countdown_time = timedelta(seconds=task['timers'][1]) if len(task['timers']) > 1 else None
+            task_id = task["id"]
+            countdown_time = (
+                timedelta(seconds=task["timers"][1])
+                if len(task["timers"]) > 1
+                else None
+            )
             # 初始化时任务未开始，所以start和end都为None
-            self.timers[task_id] = TimerStatus(task_id, countdown_time, None, None, False, timedelta(0))
+            self.timers[task_id] = TimerStatus(
+                task_id,
+                countdown_time,
+                None,
+                None,
+                False,
+                timedelta(0),
+            )
 
     def get_timer(self, task_id: int) -> Optional[TimerStatus]:
         """根据任务ID获取计时器实例"""
         return self.timers.get(task_id)
 
-    def create_timer(self, task_id: int, countdown_time: Optional[timedelta] = None):
+    def create_timer(
+        self, task_id: int, countdown_time: Optional[timedelta] = None
+    ):
         """创建新的计时器实例"""
         if task_id in self.timers:
             raise ValueError(f"Task ID {task_id} already exists.")
-        self.timers[task_id] = TimerStatus(task_id, countdown_time, None, None, False, timedelta(0))
+        self.timers[task_id] = TimerStatus(
+            task_id, countdown_time, None, None, False, timedelta(0)
+        )
 
-    def update_timer(self, task_id: int, countdown_time: Optional[timedelta] = None):
+    def update_timer(
+        self, task_id: int, countdown_time: Optional[timedelta] = None
+    ):
         """更新现有计时器实例"""
         if task_id not in self.timers:
             raise ValueError(f"Task ID {task_id} does not exist.")
-        self.timers[task_id] = TimerStatus(task_id, countdown_time, None, None, False, timedelta(0))
+        self.timers[task_id] = TimerStatus(
+            task_id, countdown_time, None, None, False, timedelta(0)
+        )
 
     def delete_timer(self, task_id: int):
         """删除计时器实例"""
@@ -49,14 +69,22 @@ class TimerTasksManager:
         """开始计时器实例"""
         if task_id not in self.timers:
             # 如果任务 ID 不存在，创建一个新的计时器任务
-            self.timers[task_id] = TimerStatus(task_id=task_id, countdown=None, start=None, end=None, running=False,
-                                               used_time=timedelta(0))
+            self.timers[task_id] = TimerStatus(
+                task_id=task_id,
+                countdown=None,
+                start=None,
+                end=None,
+                running=False,
+                used_time=timedelta(0),
+            )
         timer = self.timers[task_id]
         if timer.running:
             # 如果计时器已经在运行，不需要重新启动
             return
         # 更新计时器状态为运行中，并设置开始时间
-        self.timers[task_id] = timer._replace(start=datetime.datetime.now(), running=True)
+        self.timers[task_id] = timer._replace(
+            start=datetime.datetime.now(), running=True
+        )
         self.app.update_timer_label(task_id)
 
     def pause_timer(self, task_id: int):
@@ -69,7 +97,8 @@ class TimerTasksManager:
         # 计算已经使用的时间，并更新计时器状态为暂停
         self.timers[task_id] = timer._replace(
             running=False,
-            used_time=timer.used_time + (datetime.datetime.now() - timer.start)
+            used_time=timer.used_time
+            + (datetime.datetime.now() - timer.start),
         )
 
     def get_elapsed_time(self, task_id: int) -> timedelta:
@@ -78,12 +107,14 @@ class TimerTasksManager:
             raise ValueError(f"Task ID {task_id} does not exist.")
         timer = self.timers[task_id]
         if timer.running:
-            elapsed_time = timer.used_time + (datetime.datetime.now() - timer.start)
+            elapsed_time = timer.used_time + (
+                datetime.datetime.now() - timer.start
+            )
         else:
             elapsed_time = timer.used_time
         return elapsed_time
 
-    def stop_timer(self, task_id: int, note: str = ''):
+    def stop_timer(self, task_id: int, note: str = ""):
         """停止计时器实例并保存记录"""
         if task_id not in self.timers:
             raise ValueError(f"Task ID {task_id} does not exist.")
@@ -93,13 +124,19 @@ class TimerTasksManager:
             return
         # 计算最终使用的时间，并更新计时器状态为停止
         used_time = self.get_elapsed_time(task_id)
-        timer = timer._replace(end=datetime.datetime.now(), running=False, used_time=used_time)
+        timer = timer._replace(
+            end=datetime.datetime.now(),
+            running=False,
+            used_time=used_time,
+        )
         # 使用 TaskRecorder 保存记录
         self.save_timer_record(timer, note)
         # 从计时器列表中移除
         del self.timers[task_id]
 
-    def save_timer_record(self, timer_status: TimerStatus, note: str = ''):
+    def save_timer_record(
+        self, timer_status: TimerStatus, note: str = ""
+    ):
         """使用 TaskRecorder 保存计时器任务记录"""
         # 创建 TaskRecord 实例并保存
         task_record = TaskRecorder.timer_record(timer_status, note)
@@ -112,6 +149,7 @@ class TimerTasksManager:
             if record.task_id == task_id:
                 total_time += record.valid_time
         return total_time
+
 
 # 示例使用
 if __name__ == "__main__":
